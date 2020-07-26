@@ -4,21 +4,26 @@
     <meta charset="UTF-8">
     <title>Erty Reddit Time 2019</title>
     <style>
-        div.tooltip {
-            position: absolute;
+        body{
+            background: #ABC;
+            font-family: sans-serif;
             text-align: center;
-            width: 60px;
-            height: 28px;
-            padding: 2px;
-            font: 12px sans-serif;
-            border: 0px;
-            border-radius: 8px;
-            pointer-events: none;
-            cursor: default;
         }
 
-        .time {
-            pointer-events: none;
+        #about {
+            max-width: 700px;
+            text-align: left;
+            margin: 0 auto;
+        }
+
+        #stats {
+            max-width: 700px;
+            text-align: center;
+            margin: 0 auto;
+        }
+
+        svg {
+            margin: 0 auto;
         }
     </style>
     <script src="https://d3js.org/d3.v5.min.js"></script>
@@ -26,6 +31,18 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.31/moment-timezone.min.js" integrity="sha512-GqWOXT1UPIvzojfXEPf2ByPu4S0iwX0SfFfZ985fePNpTJPuiWKn47mXd0iyfcpcjcmM/HIRtvrd5TsR87A0Zg==" crossorigin="anonymous"></script>
 </head>
 <body>
+    <h1>Erty's Reddit Time 2019</h1>
+    <div id="about">
+        <p>In 2019, I decided that I was going to track all of the time I spent on Reddit and Imgur (my two largest time-wasters at the time).</p>
+        <p>So, I made a rule: I could go on those sites as much as I wanted, but I had to "check in" by adding a row to a spreadsheet before I started, and "check out" on that row when I was done.</p>
+        <p>This was not only an exercise in data collection, but also mindfulness. With my first child born this year, I knew I wanted to spend less time aimlessly scrolling and more time with my family, but I wasn't sure how to break free of the desire to pull my phone out and look at memes every time I was bored for more than a second.</p>
+        <p>Through this project, I forced myself to become aware of the time I was wasting, and have happily stopped browsing those sites (except on occasion with friends) in 2020. I think this has contributed a lot to my wellbeing.</p>
+        <p>By <a href="http://erty.me">Erty</a>. On <a href="https://github.com/ertyseidohl/reddit-time">Github</a>.</p>
+    </div>
+    <div id="stats">
+        <p>In 2019, I spent 17,727 minutes browsing memes, or 12.3 days. That's 3.34% of the year.</p>
+        <p>Below, the black lines represent this time.</p>
+    </div>
     <div id="container"></div>
     <script src="./script.js"></script>
 </body>

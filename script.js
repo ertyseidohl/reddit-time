@@ -1,7 +1,9 @@
 const DAY_WIDTH = 100
 const DAY_HEIGHT = 100
 const DAY_PADDING_X = 5
-const DAY_PADDING_Y = 5
+const DAY_PADDING_Y = 15
+const OFFSET_Y = 30
+const OFFSET_X = DAY_WIDTH
 
 // This may be a bit incorrect during leap years
 // But all my data is in 2019 so /shrug
@@ -21,7 +23,7 @@ async function getData() {
 }
 
 function indexToX(i) {
-    return (i % 7) * (DAY_WIDTH + DAY_PADDING_X)
+    return (i % 7) * (DAY_WIDTH + DAY_PADDING_X) + OFFSET_X
 }
 
 function indexToY(i) {
@@ -40,7 +42,7 @@ function getSlabHeight(d) {
 }
 
 function getSlabX(d, firstDay) {
-    return (d.date.diff(firstDay, "days") % 7) * (DAY_WIDTH + DAY_PADDING_X)
+    return (d.date.diff(firstDay, "days") % 7) * (DAY_WIDTH + DAY_PADDING_X) + OFFSET_X
 }
 
 function getSlabY(d, firstDay) {
@@ -49,20 +51,8 @@ function getSlabY(d, firstDay) {
     return dayOffset + (timePercentage * DAY_HEIGHT)
 }
 
-function onMouseOver(day, tooltip) {
-    const momentDate = moment.tz(day, "YYYY-MM-DD", "America/New_York")
-    tooltip.transition()
-        .duration(100)
-        .style("opacity", .9);
-    tooltip.html(momentDate.format("ddd, MMM Do"))
-        .style("left", (d3.event.pageX) + "px")
-        .style("top", (d3.event.pageY - 28) + "px");
-}
-
-function onMouseOut(tooltip) {
-    tooltip.transition()
-        .duration(100)
-        .style("opacity", 0);
+function getDayLabel(day) {
+    return moment.tz(day, "YYYY-MM-DD", "America/New_York").format("MMM Do")
 }
 
 function drawSVG(data) {
@@ -94,10 +84,16 @@ function drawSVG(data) {
             .attr("width", DAY_WIDTH)
             .attr("height", DAY_HEIGHT)
             .attr("x", (_, i) => indexToX(i))
-            .attr("y", (_, i) => indexToY(i))
-            .attr("fill", "#eee")
-            .on("mouseover", d => onMouseOver(d, tooltip))
-            .on("mouseout", _ => onMouseOut(tooltip))
+            .attr("y", (_, i) => indexToY(i) + OFFSET_Y)
+            .attr("fill", (_, i) => i < 2 ? "#ccc" : "#eee")
+
+    const dayLabels = svg.selectAll("text.daytext")
+        .data(all_days)
+            .join("text")
+            .attr("class", "daytext")
+            .text(d => getDayLabel(d))
+            .attr("x", (_, i) => indexToX(i))
+            .attr("y", (_, i) => indexToY(i) + OFFSET_Y - 2)
 
     const timeSlabs = svg.selectAll("rect.time")
         .data(data)
@@ -106,9 +102,7 @@ function drawSVG(data) {
             .attr("width", DAY_WIDTH)
             .attr("height", d => getSlabHeight(d))
             .attr("x", d => getSlabX(d, FIRST_DAY))
-            .attr("y", d => getSlabY(d, FIRST_DAY))
-
-
+            .attr("y", d => getSlabY(d, FIRST_DAY) + OFFSET_Y)
 }
 
 getData().then(drawSVG)
