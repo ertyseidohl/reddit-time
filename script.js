@@ -1,24 +1,54 @@
+document.getElementById("warning").style.display = "none";
+
 const DAY_WIDTH = 100
 const DAY_HEIGHT = 100
 const DAY_PADDING_X = 5
 const DAY_PADDING_Y = 15
 const OFFSET_Y = 30
 const OFFSET_X = DAY_WIDTH
+const EXTRA_PADDING = 100
 
-// This may be a bit incorrect during leap years
-// But all my data is in 2019 so /shrug
 const MIN_PER_DAY = 1440
 
-moment.tz.add("America/New_York|EST EDT EWT EPT|50 40 40 40|01010101010101010101010101010101010101010101010102301010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010|-261t0 1nX0 11B0 1nX0 11B0 1qL0 1a10 11z0 1qN0 WL0 1qN0 11z0 1o10 11z0 1o10 11z0 1o10 11z0 1o10 11z0 1qN0 11z0 1o10 11z0 1o10 11z0 1o10 11z0 1o10 11z0 1qN0 WL0 1qN0 11z0 1o10 11z0 1o10 11z0 1o10 11z0 1o10 11z0 1qN0 WL0 1qN0 11z0 1o10 11z0 RB0 8x40 iv0 1o10 11z0 1o10 11z0 1o10 11z0 1o10 11z0 1qN0 WL0 1qN0 11z0 1o10 11z0 1o10 11z0 1o10 11z0 1o10 1fz0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1fz0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1fz0 1a10 1fz0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1fz0 1cN0 1cL0 1cN0 1cL0 s10 1Vz0 LB0 1BX0 1cN0 1fz0 1a10 1fz0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1fz0 1a10 1fz0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 14p0 1lb0 14p0 1nX0 11B0 1nX0 11B0 1nX0 14p0 1lb0 14p0 1lb0 14p0 1nX0 11B0 1nX0 11B0 1nX0 14p0 1lb0 14p0 1lb0 14p0 1lb0 14p0 1nX0 11B0 1nX0 11B0 1nX0 14p0 1lb0 14p0 1lb0 14p0 1nX0 11B0 1nX0 11B0 1nX0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0|21e6")
+const SKIP_DAYS = {
+    "2019": [2, 4],
+    "2021": [4, 1],
+    "2022": [6, 0],
+    "2023": [0, 6],
+    "2024": [1, 4],
+}
+
+moment.tz.add("America/New_York|EST EDT|50 40|010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010|K70 1cL0 1cN0 1fz0 1cN0 1cL0 1cN0 1cL0 s10 1Vz0 LB0 1BX0 1cN0 1fz0 1a10 1fz0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1fz0 1a10 1fz0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 14p0 1lb0 14p0 1nX0 11B0 1nX0 11B0 1nX0 14p0 1lb0 14p0 1lb0 14p0 1nX0 11B0 1nX0 11B0 1nX0 14p0 1lb0 14p0 1lb0 14p0 1lb0 14p0 1nX0 11B0 1nX0 11B0 1nX0 14p0 1lb0 14p0 1lb0 14p0 1nX0 11B0 1nX0 11B0 1nX0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0|21e6")
 
 async function getData() {
-    const csvData = await d3.csv("./Reddit Log 2019 - All.csv")
+    const csvData_2019 = await d3.csv("./Reddit Log 2019.csv")
+
+    const csvData_2021_2024 = await d3.csv("./Reddit Log 2021-2024.csv")
+
+    const csvData = csvData_2019.concat(csvData_2021_2024)
 
     return csvData.map(d => {
-        const date = moment.tz(d.date + "T00:00", "YYYY-MM-DDTHH:mm", "America/New_York")
-        const start = moment.tz(d.date + "T" + d.start, "YYYY-MM-DDTHH:mm", "America/New_York")
-        const stop =  moment.tz(d.date + "T" + d.stop, "YYYY-MM-DDTHH:mm", "America/New_York")
-        return {date, start, stop}
+        try {
+            const date = moment.tz(d.date + "T00:00", "YYYY-MM-DDTHH:mm", "America/New_York")
+            const start = moment.tz(d.date + "T" + d.start, "YYYY-MM-DDTHH:mm", "America/New_York")
+            const stop =  moment.tz(d.date + "T" + d.stop, "YYYY-MM-DDTHH:mm", "America/New_York")
+
+            if (isNaN(date.valueOf())) {
+                console.log("Invalid date: " + d.date)
+            }
+
+            if (isNaN(parseInt(d.start[0]))) {
+                // Not valid if we don't start with a number
+                return {date: date, start: 0, stop: 0, isValid: false};
+            }
+
+            if (stop.isBefore(start)) {
+                throw new Error(`Invalid time range on ${date.format('YYYY-MM-DD')}: ${d.start} to ${d.stop}`);
+            }
+            return {date, start, stop, isValid: true}
+        } catch (err) {
+            console.log(d, err)
+        }
     })
 }
 
@@ -55,29 +85,38 @@ function getDayLabel(day) {
     return moment.tz(day, "YYYY-MM-DD", "America/New_York").format("MMM Do")
 }
 
-function drawSVG(data) {
-    FIRST_DAY = moment.tz(data[0].date, "YYYY-MM-DD", "America/New_York").startOf("week")
-    LAST_DAY = moment.tz(data[data.length - 1].date, "YYYY-MM-DD", "America/New_York").endOf("week")
+function drawSVG(data, year) {
+    if (year == "2021") {
+        FIRST_DAY = moment.tz(year + "-06-20", "YYYY-MM-DD", "America/New_York").startOf("week")
+        document.getElementById("2021").style.display = "block";
+    } else {
+        FIRST_DAY = moment.tz(year + "-01-01", "YYYY-MM-DD", "America/New_York").startOf("week")
+        document.getElementById("2021").style.display = "none";
+    }
+
+    LAST_DAY = moment.tz(year + "-12-31", "YYYY-MM-DD", "America/New_York").endOf("week")
 
     all_days = []
     curr_day = FIRST_DAY.clone()
-    while (curr_day.isBefore(LAST_DAY)) {
+    while (curr_day.isSameOrBefore(LAST_DAY)) {
         all_days.push(curr_day.format("YYYY-MM-DD"))
         curr_day.add(1, "day")
     }
 
+    const invalid_days = new Set(data.filter(d => !d.isValid).map(d => d.date.format("YYYY-MM-DD")))
+
     const svg = d3.select("#container")
         .append("svg")
         .attr("width", DAY_WIDTH * 9)
-        .attr("height", (DAY_HEIGHT + DAY_PADDING_Y) * (all_days.length / 7))
+        .attr("height", (DAY_HEIGHT + DAY_PADDING_Y) * (all_days.length / 7) + EXTRA_PADDING)
         .attr("font-family", "sans-serif")
         .attr("font-size", 10);
 
-    var tooltip = d3.select("body").append("div")
+    d3.select("body").append("div")
         .attr("class", "tooltip")
         .style("opacity", 0);
 
-    const dayBoxes = svg.selectAll("rect.day")
+    svg.selectAll("rect.day")
         .data(all_days)
             .join("rect")
             .attr("class", "day")
@@ -85,9 +124,18 @@ function drawSVG(data) {
             .attr("height", DAY_HEIGHT)
             .attr("x", (_, i) => indexToX(i))
             .attr("y", (_, i) => indexToY(i) + OFFSET_Y)
-            .attr("fill", (_, i) => i < 2 ? "#ccc" : "#eee")
+            .attr("fill", (_, i) => {
+                if (invalid_days.has(all_days[i])) {
+                    return "#ccc"
+                }
+                // SKIP_DAYS is [start of year, end of year]
+                if (i < SKIP_DAYS[year][0] || all_days.length - i <= SKIP_DAYS[year][1]) {
+                    return "#ccc"
+                }
+                return "#eee"
+            })
 
-    const dayLabels = svg.selectAll("text.daytext")
+    svg.selectAll("text.daytext")
         .data(all_days)
             .join("text")
             .attr("class", "daytext")
@@ -95,14 +143,37 @@ function drawSVG(data) {
             .attr("x", (_, i) => indexToX(i))
             .attr("y", (_, i) => indexToY(i) + OFFSET_Y - 2)
 
-    const timeSlabs = svg.selectAll("rect.time")
-        .data(data)
+    const dateFilter = d => {
+        return (d.isValid &&
+        d.date.year().toString() === year &&
+        d.date.isBetween(FIRST_DAY, LAST_DAY))
+    }
+
+    svg.selectAll("rect.time")
+        .data(data.filter(dateFilter))
             .join("rect")
             .attr("class", "time")
             .attr("width", DAY_WIDTH)
             .attr("height", d => getSlabHeight(d))
             .attr("x", d => getSlabX(d, FIRST_DAY))
             .attr("y", d => getSlabY(d, FIRST_DAY) + OFFSET_Y)
+
+    const total_min = data
+        .filter(dateFilter)
+        .reduce((acc, d) => acc + d.stop.diff(d.start, 'minutes'), 0);
+    const total_days = (total_min / MIN_PER_DAY).toFixed(1);
+    const percent = ((total_min / (MIN_PER_DAY * 365)) * 100).toFixed(1);
+
+    document.getElementById("stats-text").innerText = `In ${year}, I spent ${total_min.toLocaleString()} minutes consuming content on the internet, or ${total_days} days. That's ${percent}% of the year.`
 }
 
-getData().then(drawSVG)
+function draw(year) {
+    d3.select('#container svg').remove();
+    getData().then(d => drawSVG(d, year));
+}
+
+draw("2019");
+
+document.getElementById('selector').addEventListener('change', (event) => {
+    draw(event.target.value);
+});
